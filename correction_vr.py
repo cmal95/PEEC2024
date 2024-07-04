@@ -11,6 +11,7 @@ import pandas as pd
 from astropy.io import fits
 import os
 from PyAstronomy import pyasl
+import vsini_code
 
 PATH_TO_SAVE='/home/spec/WORK/PEEC2024/Spectra_rv/'
 
@@ -39,7 +40,9 @@ def treat_rv(name_file,l1,l2,ref):
     inf = np.where(ll_r>l2)[0][0]
     ini2 = np.where(ll_r0>l1)[0][0]
     inf2 = np.where(ll_r0>l2)[0][0]
-    rv, cc = pyasl.crosscorrRV(ll_r[ini:inf], flux_r[ini:inf], ll_r0[ini2:inf2], flux_r0[ini2:inf2], -100., 100., 0.1, skipedge=1000)
+    #ll_r, flux_r = ll_r[ini:inf],flux_r[ini:inf]
+    #ll_r0, flux_r0 = ll_r0[ini2:inf2], flux_r0[ini2:inf2]
+    rv, cc = pyasl.crosscorrRV(ll_r[ini:inf], flux_r[ini:inf], ll_r0[ini2:inf2], flux_r0[ini2:inf2], -100., 100., 0.1, skipedge=300)
     maxind = np.argmax(cc)
     rv = rv[maxind]
     print("REF0: Cross-correlation function is maximized at dRV = ", rv, " km/s")
@@ -78,15 +81,19 @@ ref = '/home/spec/Programs/ARES/sun_harps_ganymede.fits'
 'list of spectra to correct:'
 spectra_ = os.listdir('/home/spec/WORK/PEEC2024/spectra_vsin2_4')
 
+directory="/home/spec/WORK/vsinimoog24/exp_stars_information.csv"
+Table=pd.read_csv(directory)
 
 'correction'
-#for i range (0,len(spectra_)):
- #   if 'fits' in spectra_[i]:
-#treat_rv('/home/spec/WORK/PEEC2024/spectra_vsin2_4/'+'WASP-181_HARPSS_115000_378_691_2020.fits',4000,6000, ref)
-     
-for l in range(4000,6800,200):
-    treat_rv('/home/spec/WORK/PEEC2024/spectra_vsin2_4/'+'CoRoT-32_SOPHIE_HE_2020.fits',l,l+200, ref)
-    print(l,l+200)
-
+#for i in range (0,len(Table)):
+    #if 'fits' in spectra_[i]:
+treat_rv('/home/spec/WORK/vsinimoog24/spectra/'+Table["fits_name"][0].replace("_rv.fits",".fits"),5000,6800, ref)
+#vsini_code.main()
+ 
+'''for l in range(5000,6800,10):
+    treat_rv('/home/spec/WORK/PEEC2024/spectra_vsin2_4/'+Table["fits_name"][0].replace("_rv.fits",".fits"),l,l+10, ref)
+    vsini_code.main(p  )
+    print(l,l+10)
+'''
 
 
